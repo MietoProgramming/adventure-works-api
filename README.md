@@ -1,4 +1,4 @@
-# Adventure Works API
+# Airlines API
 
 This project implements an API for an airline booking system using four different protocols:
 
