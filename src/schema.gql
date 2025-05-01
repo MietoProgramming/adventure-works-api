@@ -1,0 +1,114 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Aircraft {
+  aircraft_code: String!
+  flights: [Flight!]
+  model: String!
+  range: Float!
+  seats: [Seat!]
+}
+
+type Airport {
+  airport_code: String!
+  airport_name: String!
+  arrivals: [Flight!]
+  city: String!
+  departures: [Flight!]
+  timezone: String!
+}
+
+type BoardingPass {
+  boarding_no: Int!
+  flight_id: Int!
+  seat_no: String!
+  ticketFlight: TicketFlight
+  ticket_no: String!
+}
+
+type Booking {
+  book_date: DateTime!
+  book_ref: String!
+  tickets: [Ticket!]
+  total_amount: Float!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Flight {
+  actual_arrival: DateTime
+  actual_departure: DateTime
+  aircraft: Aircraft
+  aircraft_code: String!
+  arrivalAirport: Airport
+  arrival_airport: String!
+  departureAirport: Airport
+  departure_airport: String!
+  flight_id: Int!
+  flight_no: String!
+  scheduled_arrival: DateTime!
+  scheduled_departure: DateTime!
+  status: String!
+  ticketFlights: [TicketFlight!]
+}
+
+type FlightStatusChange {
+  flight: Flight!
+  newStatus: String!
+  previousStatus: String!
+}
+
+type Query {
+  aircraft(aircraftCode: String!): Aircraft!
+  aircrafts: [Aircraft!]!
+  airport(airportCode: String!): Airport!
+  airports: [Airport!]!
+  booking(bookRef: String!): Booking!
+  bookings: [Booking!]!
+  flight(id: Int!): Flight!
+  flights: [Flight!]!
+  ticket(ticketNo: String!): Ticket!
+  ticketFlight(flightId: Int!, ticketNo: String!): TicketFlight!
+  ticketFlights: [TicketFlight!]!
+  tickets: [Ticket!]!
+}
+
+type Seat {
+  aircraft: Aircraft
+  aircraft_code: String!
+  fare_conditions: String!
+  seat_no: String!
+}
+
+type Subscription {
+  bookingCanceled: Booking!
+  bookingCreated: Booking!
+  bookingUpdated: Booking!
+  flightCreated: Flight!
+  flightStatusChanged: FlightStatusChange!
+  flightUpdated: Flight!
+}
+
+type Ticket {
+  book_ref: String!
+  booking: Booking
+  contact_data: String
+  passenger_id: String!
+  passenger_name: String!
+  ticketFlights: [TicketFlight!]
+  ticket_no: String!
+}
+
+type TicketFlight {
+  amount: Float!
+  boardingPass: BoardingPass
+  fare_conditions: String!
+  flight: Flight
+  flight_id: Int!
+  ticket: Ticket
+  ticket_no: String!
+}

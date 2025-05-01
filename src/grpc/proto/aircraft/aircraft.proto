@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package airline.aircraft;
+
+import "../common/common.proto";
+
+// Aircraft Service
+service AircraftService {
+  rpc GetAllAircrafts(airline.common.Empty) returns (AircraftList);
+  rpc GetAircraftByCode(AircraftByCodeRequest) returns (Aircraft);
+}
+
+message AircraftByCodeRequest {
+  string aircraft_code = 1;
+}
+
+message Aircraft {
+  string aircraft_code = 1;
+  string model = 2;
+  int32 range = 3;
+}
+
+message AircraftList {
+  repeated Aircraft aircrafts = 1;
+}

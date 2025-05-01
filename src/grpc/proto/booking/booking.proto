@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package airline.booking;
+
+import "../common/common.proto";
+
+// Booking Service
+service BookingService {
+  rpc GetAllBookings(airline.common.Empty) returns (BookingList);
+  rpc GetBookingByRef(BookingByRefRequest) returns (Booking);
+  rpc StreamBookingCreated(airline.common.Empty) returns (stream BookingEvent);
+  rpc StreamBookingUpdated(airline.common.Empty) returns (stream BookingEvent);
+  rpc StreamBookingCanceled(airline.common.Empty) returns (stream BookingEvent);
+}
+
+message BookingByRefRequest {
+  string book_ref = 1;
+}
+
+message Booking {
+  string book_ref = 1;
+  string book_date = 2;
+  float total_amount = 3;
+}
+
+message BookingList {
+  repeated Booking bookings = 1;
+}
+
+message BookingEvent {
+  Booking booking = 1;
+}

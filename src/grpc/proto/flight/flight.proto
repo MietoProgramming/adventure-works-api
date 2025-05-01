@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package airline.flight;
+
+import "../common/common.proto";
+
+// Flight Service
+service FlightService {
+  rpc GetAllFlights(airline.common.Empty) returns (FlightList);
+  rpc GetFlightById(FlightByIdRequest) returns (Flight);
+  rpc StreamFlightCreated(airline.common.Empty) returns (stream FlightEvent);
+  rpc StreamFlightUpdated(airline.common.Empty) returns (stream FlightEvent);
+  rpc StreamFlightStatusChanged(airline.common.Empty) returns (stream FlightStatusEvent);
+}
+
+message FlightByIdRequest {
+  int32 id = 1;
+}
+
+message Flight {
+  int32 id = 1;
+  string flight_no = 2;
+  string scheduled_departure = 3;
+  string scheduled_arrival = 4;
+  string departure_airport = 5;
+  string arrival_airport = 6;
+  string status = 7;
+  string aircraft_code = 8;
+  float actual_departure = 9;
+  float actual_arrival = 10;
+}
+
+message FlightList {
+  repeated Flight flights = 1;
+}
+
+message FlightEvent {
+  Flight flight = 1;
+}
+
+message FlightStatusEvent {
+  Flight flight = 1;
+  string previous_status = 2;
+  string new_status = 3;
+}

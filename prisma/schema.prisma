@@ -1,0 +1,107 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model aircrafts_data {
+  aircraft_code String    @id(map: "aircrafts_pkey") @db.Char(3)
+  model         Json
+  range         Int
+  flights       flights[]
+  seats         seats[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model airports_data {
+  airport_code                                     String               @id @db.Char(3)
+  airport_name                                     Json
+  city                                             Json
+  coordinates                                      Unsupported("point")
+  timezone                                         String
+  flights_flights_arrival_airportToairports_data   flights[]            @relation("flights_arrival_airportToairports_data")
+  flights_flights_departure_airportToairports_data flights[]            @relation("flights_departure_airportToairports_data")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model boarding_passes {
+  ticket_no      String         @db.Char(13)
+  flight_id      Int
+  boarding_no    Int
+  seat_no        String         @db.VarChar(4)
+  ticket_flights ticket_flights @relation(fields: [ticket_no, flight_id], references: [ticket_no, flight_id], onDelete: NoAction, onUpdate: NoAction, map: "boarding_passes_ticket_no_fkey")
+
+  @@id([ticket_no, flight_id])
+  @@unique([flight_id, boarding_no])
+  @@unique([flight_id, seat_no])
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model bookings {
+  book_ref     String    @id @db.Char(6)
+  book_date    DateTime  @db.Timestamptz(6)
+  total_amount Decimal   @db.Decimal(10, 2)
+  tickets      tickets[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model flights {
+  flight_id                                              Int              @id @default(autoincrement())
+  flight_no                                              String           @db.Char(6)
+  scheduled_departure                                    DateTime         @db.Timestamptz(6)
+  scheduled_arrival                                      DateTime         @db.Timestamptz(6)
+  departure_airport                                      String           @db.Char(3)
+  arrival_airport                                        String           @db.Char(3)
+  status                                                 String           @db.VarChar(20)
+  aircraft_code                                          String           @db.Char(3)
+  actual_departure                                       DateTime?        @db.Timestamptz(6)
+  actual_arrival                                         DateTime?        @db.Timestamptz(6)
+  aircrafts_data                                         aircrafts_data   @relation(fields: [aircraft_code], references: [aircraft_code], onDelete: NoAction, onUpdate: NoAction)
+  airports_data_flights_arrival_airportToairports_data   airports_data    @relation("flights_arrival_airportToairports_data", fields: [arrival_airport], references: [airport_code], onDelete: NoAction, onUpdate: NoAction)
+  airports_data_flights_departure_airportToairports_data airports_data    @relation("flights_departure_airportToairports_data", fields: [departure_airport], references: [airport_code], onDelete: NoAction, onUpdate: NoAction)
+  ticket_flights                                         ticket_flights[]
+
+  @@unique([flight_no, scheduled_departure])
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model seats {
+  aircraft_code   String         @db.Char(3)
+  seat_no         String         @db.VarChar(4)
+  fare_conditions String         @db.VarChar(10)
+  aircrafts_data  aircrafts_data @relation(fields: [aircraft_code], references: [aircraft_code], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([aircraft_code, seat_no])
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model ticket_flights {
+  ticket_no       String           @db.Char(13)
+  flight_id       Int
+  fare_conditions String           @db.VarChar(10)
+  amount          Decimal          @db.Decimal(10, 2)
+  boarding_passes boarding_passes?
+  flights         flights          @relation(fields: [flight_id], references: [flight_id], onDelete: NoAction, onUpdate: NoAction)
+  tickets         tickets          @relation(fields: [ticket_no], references: [ticket_no], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([ticket_no, flight_id])
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model tickets {
+  ticket_no      String           @id @db.Char(13)
+  book_ref       String           @db.Char(6)
+  passenger_id   String           @db.VarChar(20)
+  passenger_name String
+  contact_data   Json?
+  ticket_flights ticket_flights[]
+  bookings       bookings         @relation(fields: [book_ref], references: [book_ref], onDelete: NoAction, onUpdate: NoAction)
+}

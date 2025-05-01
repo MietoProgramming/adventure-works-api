@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package airline.ticketflight;
+
+import "../common/common.proto";
+
+// TicketFlight Service
+service TicketFlightService {
+  rpc GetAllTicketFlights(airline.common.Empty) returns (TicketFlightList);
+  rpc GetTicketFlightByTicketAndFlightId(TicketFlightByTicketAndFlightIdRequest) returns (TicketFlight);
+}
+
+message TicketFlightByTicketAndFlightIdRequest {
+  string ticket_no = 1;
+  int32 flight_id = 2;
+}
+
+message TicketFlight {
+  string ticket_no = 1;
+  int32 flight_id = 2;
+  string fare_conditions = 3;
+  float amount = 4;
+}
+
+message TicketFlightList {
+  repeated TicketFlight ticket_flights = 1;
+}

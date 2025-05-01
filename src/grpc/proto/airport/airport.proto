@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package airline.airport;
+
+import "../common/common.proto";
+
+// Airport Service
+service AirportService {
+  rpc GetAllAirports(airline.common.Empty) returns (AirportList);
+  rpc GetAirportByCode(AirportByCodeRequest) returns (Airport);
+}
+
+message AirportByCodeRequest {
+  string airport_code = 1;
+}
+
+message Airport {
+  string airport_code = 1;
+  string airport_name = 2;
+  string city = 3;
+  string timezone = 4;
+}
+
+message AirportList {
+  repeated Airport airports = 1;
+}

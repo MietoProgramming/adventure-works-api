@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package airline.ticket;
+
+import "../common/common.proto";
+
+// Ticket Service
+service TicketService {
+  rpc GetAllTickets(airline.common.Empty) returns (TicketList);
+  rpc GetTicketByNo(TicketByNoRequest) returns (Ticket);
+}
+
+message TicketByNoRequest {
+  string ticket_no = 1;
+}
+
+message Ticket {
+  string ticket_no = 1;
+  string book_ref = 2;
+  string passenger_id = 3;
+  string passenger_name = 4;
+  string contact_data = 5;
+}
+
+message TicketList {
+  repeated Ticket tickets = 1;
+}
