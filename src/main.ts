@@ -8,6 +8,11 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  // Enable CORS to allow access from different ports on localhost
+  app.enableCors({
+    origin: '*',
+  });
+
   const protoPath = join(__dirname, 'grpc/proto/airline.proto');
   console.log('protoPath', protoPath);
   app.connectMicroservice<MicroserviceOptions>({
