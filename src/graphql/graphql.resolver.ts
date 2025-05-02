@@ -13,13 +13,17 @@ import {
   FlightUpdatedEvent,
 } from '../domains/flight/events/flight.events';
 import { GraphqlService } from './graphql.service';
-import { Aircraft } from './models/aircraft.model';
-import { Airport } from './models/airport.model';
-import { Booking } from './models/booking.model';
+import { Aircraft, PaginatedAircrafts } from './models/aircraft.model';
+import { Airport, PaginatedAirports } from './models/airport.model';
+import { Booking, PaginatedBookings } from './models/booking.model';
 import { FlightStatusChange } from './models/flight-status-change.model';
-import { Flight } from './models/flight.model';
-import { TicketFlight } from './models/ticket-flight.model';
-import { Ticket } from './models/ticket.model';
+import { Flight, PaginatedFlights } from './models/flight.model';
+import { PaginationInput } from './models/pagination.model';
+import {
+  PaginatedTicketFlights,
+  TicketFlight,
+} from './models/ticket-flight.model';
+import { PaginatedTickets, Ticket } from './models/ticket.model';
 
 // Define subscription event names
 export const FLIGHT_CREATED = 'flightCreated';
@@ -87,9 +91,12 @@ export class GraphqlResolver implements OnModuleInit {
   }
 
   // Flight queries
-  @Query(() => [Flight], { name: 'flights' })
-  findAllFlights() {
-    return this.graphqlService.findAllFlights();
+  @Query(() => PaginatedFlights, { name: 'flights' })
+  findAllFlights(
+    @Args('pagination', { type: () => PaginationInput, nullable: true })
+    pagination?: PaginationInput,
+  ) {
+    return this.graphqlService.findAllFlights(pagination);
   }
 
   @Query(() => Flight, { name: 'flight' })
@@ -98,9 +105,12 @@ export class GraphqlResolver implements OnModuleInit {
   }
 
   // Booking queries
-  @Query(() => [Booking], { name: 'bookings' })
-  findAllBookings() {
-    return this.graphqlService.findAllBookings();
+  @Query(() => PaginatedBookings, { name: 'bookings' })
+  findAllBookings(
+    @Args('pagination', { type: () => PaginationInput, nullable: true })
+    pagination?: PaginationInput,
+  ) {
+    return this.graphqlService.findAllBookings(pagination);
   }
 
   @Query(() => Booking, { name: 'booking' })
@@ -109,9 +119,12 @@ export class GraphqlResolver implements OnModuleInit {
   }
 
   // Aircraft queries
-  @Query(() => [Aircraft], { name: 'aircrafts' })
-  findAllAircrafts() {
-    return this.graphqlService.findAllAircrafts();
+  @Query(() => PaginatedAircrafts, { name: 'aircrafts' })
+  findAllAircrafts(
+    @Args('pagination', { type: () => PaginationInput, nullable: true })
+    pagination?: PaginationInput,
+  ) {
+    return this.graphqlService.findAllAircrafts(pagination);
   }
 
   @Query(() => Aircraft, { name: 'aircraft' })
@@ -120,9 +133,12 @@ export class GraphqlResolver implements OnModuleInit {
   }
 
   // Airport queries
-  @Query(() => [Airport], { name: 'airports' })
-  findAllAirports() {
-    return this.graphqlService.findAllAirports();
+  @Query(() => PaginatedAirports, { name: 'airports' })
+  findAllAirports(
+    @Args('pagination', { type: () => PaginationInput, nullable: true })
+    pagination?: PaginationInput,
+  ) {
+    return this.graphqlService.findAllAirports(pagination);
   }
 
   @Query(() => Airport, { name: 'airport' })
@@ -131,9 +147,12 @@ export class GraphqlResolver implements OnModuleInit {
   }
 
   // Ticket queries
-  @Query(() => [Ticket], { name: 'tickets' })
-  findAllTickets() {
-    return this.graphqlService.findAllTickets();
+  @Query(() => PaginatedTickets, { name: 'tickets' })
+  findAllTickets(
+    @Args('pagination', { type: () => PaginationInput, nullable: true })
+    pagination?: PaginationInput,
+  ) {
+    return this.graphqlService.findAllTickets(pagination);
   }
 
   @Query(() => Ticket, { name: 'ticket' })
@@ -142,9 +161,12 @@ export class GraphqlResolver implements OnModuleInit {
   }
 
   // TicketFlight queries
-  @Query(() => [TicketFlight], { name: 'ticketFlights' })
-  findAllTicketFlights() {
-    return this.graphqlService.findAllTicketFlights();
+  @Query(() => PaginatedTicketFlights, { name: 'ticketFlights' })
+  findAllTicketFlights(
+    @Args('pagination', { type: () => PaginationInput, nullable: true })
+    pagination?: PaginationInput,
+  ) {
+    return this.graphqlService.findAllTicketFlights(pagination);
   }
 
   @Query(() => TicketFlight, { name: 'ticketFlight' })

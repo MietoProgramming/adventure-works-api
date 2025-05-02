@@ -1,4 +1,8 @@
 import { Injectable } from '@nestjs/common';
+import {
+  PaginatedResult,
+  PaginationDto,
+} from '../../core/models/pagination.dto';
 import { TicketFlight } from '../models/ticket-flight.model';
 import { TicketFlightRepositoryImpl } from '../repositories/ticket-flight.repository.impl';
 
@@ -8,8 +12,11 @@ export class TicketFlightService {
     private readonly ticketFlightRepository: TicketFlightRepositoryImpl,
   ) {}
 
-  async findAll(): Promise<TicketFlight[]> {
-    return this.ticketFlightRepository.findAll();
+  async findAll(
+    pagination?: PaginationDto,
+  ): Promise<TicketFlight[] | PaginatedResult<TicketFlight>> {
+    pagination = new PaginationDto(pagination);
+    return this.ticketFlightRepository.findAll(pagination);
   }
 
   async findByTicketAndFlightId(

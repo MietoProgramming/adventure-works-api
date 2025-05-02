@@ -13,9 +13,11 @@ type Aircraft {
 type Airport {
   airport_code: String!
   airport_name: String!
-  arrivals: [Flight!]
+  arrivalFlights: [Flight!]
   city: String!
-  departures: [Flight!]
+  coordinates_lat: Float
+  coordinates_lon: Float
+  departureFlights: [Flight!]
   timezone: String!
 }
 
@@ -62,19 +64,65 @@ type FlightStatusChange {
   previousStatus: String!
 }
 
+type PageInfo {
+  currentPage: Int!
+  itemCount: Int!
+  itemsPerPage: Int!
+  totalItems: Int!
+  totalPages: Int!
+}
+
+type PaginatedAircrafts {
+  data: [Aircraft!]!
+  meta: PageInfo!
+}
+
+type PaginatedAirports {
+  data: [Airport!]!
+  meta: PageInfo!
+}
+
+type PaginatedBookings {
+  data: [Booking!]!
+  meta: PageInfo!
+}
+
+type PaginatedFlights {
+  data: [Flight!]!
+  meta: PageInfo!
+}
+
+type PaginatedTicketFlights {
+  data: [TicketFlight!]!
+  meta: PageInfo!
+}
+
+type PaginatedTickets {
+  data: [Ticket!]!
+  meta: PageInfo!
+}
+
+input PaginationInput {
+  """Items per page (max 1000)"""
+  limit: Int = 100
+
+  """Page number (1-indexed)"""
+  page: Int = 1
+}
+
 type Query {
   aircraft(aircraftCode: String!): Aircraft!
-  aircrafts: [Aircraft!]!
+  aircrafts(pagination: PaginationInput): PaginatedAircrafts!
   airport(airportCode: String!): Airport!
-  airports: [Airport!]!
+  airports(pagination: PaginationInput): PaginatedAirports!
   booking(bookRef: String!): Booking!
-  bookings: [Booking!]!
+  bookings(pagination: PaginationInput): PaginatedBookings!
   flight(id: Int!): Flight!
-  flights: [Flight!]!
+  flights(pagination: PaginationInput): PaginatedFlights!
   ticket(ticketNo: String!): Ticket!
   ticketFlight(flightId: Int!, ticketNo: String!): TicketFlight!
-  ticketFlights: [TicketFlight!]!
-  tickets: [Ticket!]!
+  ticketFlights(pagination: PaginationInput): PaginatedTicketFlights!
+  tickets(pagination: PaginationInput): PaginatedTickets!
 }
 
 type Seat {

@@ -25,20 +25,20 @@ async function generateProtoTypes() {
 
   // Define proto files to process
   const protoFiles = [
-    'src/grpc/proto/common/common.proto',
-    'src/grpc/proto/flight/flight.proto',
-    'src/grpc/proto/booking/booking.proto',
-    'src/grpc/proto/aircraft/aircraft.proto',
-    'src/grpc/proto/airport/airport.proto',
-    'src/grpc/proto/ticket/ticket.proto',
-    'src/grpc/proto/ticket-flight/ticket-flight.proto',
+    'src/grpc/proto/common.proto',
+    'src/grpc/proto/flight.proto',
+    'src/grpc/proto/booking.proto',
+    'src/grpc/proto/aircraft.proto',
+    'src/grpc/proto/airport.proto',
+    'src/grpc/proto/ticket.proto',
+    'src/grpc/proto/ticket-flight.proto',
   ];
 
   try {
     console.log('Generating TypeScript files from proto definitions...');
 
     // Generate command to run protoc with ts-proto plugin
-    const command = `protoc --plugin=./node_modules/.bin/protoc-gen-ts_proto.cmd --ts_proto_out=${outputDir} --ts_proto_opt=nestJs=true --ts_proto_opt=outputServices=grpc-nest,addGrpcServiceClient=true,addNestjsRestParameter=true --proto_path=. ${protoFiles.join(
+    const command = `protoc --plugin=./node_modules/.bin/protoc-gen-ts_proto.cmd --ts_proto_out=${outputDir} --ts_proto_opt=nestJs=true --ts_proto_opt=outputServices=grpc-nest,addGrpcServiceClient=true,addNestjsRestParameter=true --proto_path=src/grpc/proto ${protoFiles.join(
       ' ',
     )}`;
 

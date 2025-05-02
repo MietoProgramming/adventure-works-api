@@ -9,10 +9,16 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { PaginationDto } from '../../domains/core/models/pagination.dto';
 import { WebsocketService } from '../websocket.service';
 
 interface SocketWithAuth extends Socket {
   clientId?: string;
+}
+
+interface PaginationParams {
+  page?: number;
+  limit?: number;
 }
 
 @WebSocketGateway({
@@ -43,8 +49,9 @@ export class WebsocketGateway
 
   // Flight events
   @SubscribeMessage('findAllFlights')
-  async findAllFlights() {
-    const flights = await this.websocketService.findAllFlights();
+  async findAllFlights(@MessageBody() paginationParams?: PaginationParams) {
+    const pagination = new PaginationDto(paginationParams);
+    const flights = await this.websocketService.findAllFlights(pagination);
     this.server.emit('flights', flights);
     return flights;
   }
@@ -57,8 +64,9 @@ export class WebsocketGateway
 
   // Booking events
   @SubscribeMessage('findAllBookings')
-  async findAllBookings() {
-    const bookings = await this.websocketService.findAllBookings();
+  async findAllBookings(@MessageBody() paginationParams?: PaginationParams) {
+    const pagination = new PaginationDto(paginationParams);
+    const bookings = await this.websocketService.findAllBookings(pagination);
     this.server.emit('bookings', bookings);
     return bookings;
   }
@@ -71,24 +79,25 @@ export class WebsocketGateway
 
   // Aircraft events
   @SubscribeMessage('findAllAircrafts')
-  async findAllAircrafts() {
-    const aircrafts = await this.websocketService.findAllAircrafts();
+  async findAllAircrafts(@MessageBody() paginationParams?: PaginationParams) {
+    const pagination = new PaginationDto(paginationParams);
+    const aircrafts = await this.websocketService.findAllAircrafts(pagination);
     this.server.emit('aircrafts', aircrafts);
     return aircrafts;
   }
 
   @SubscribeMessage('findAircraftByCode')
   async findAircraftByCode(@MessageBody() aircraftCode: string) {
-    const aircraft = await this.websocketService.findAircraftByCode(
-      aircraftCode,
-    );
+    const aircraft =
+      await this.websocketService.findAircraftByCode(aircraftCode);
     return aircraft;
   }
 
   // Airport events
   @SubscribeMessage('findAllAirports')
-  async findAllAirports() {
-    const airports = await this.websocketService.findAllAirports();
+  async findAllAirports(@MessageBody() paginationParams?: PaginationParams) {
+    const pagination = new PaginationDto(paginationParams);
+    const airports = await this.websocketService.findAllAirports(pagination);
     this.server.emit('airports', airports);
     return airports;
   }
@@ -101,8 +110,9 @@ export class WebsocketGateway
 
   // Ticket events
   @SubscribeMessage('findAllTickets')
-  async findAllTickets() {
-    const tickets = await this.websocketService.findAllTickets();
+  async findAllTickets(@MessageBody() paginationParams?: PaginationParams) {
+    const pagination = new PaginationDto(paginationParams);
+    const tickets = await this.websocketService.findAllTickets(pagination);
     this.server.emit('tickets', tickets);
     return tickets;
   }
@@ -115,8 +125,12 @@ export class WebsocketGateway
 
   // Ticket Flight events
   @SubscribeMessage('findAllTicketFlights')
-  async findAllTicketFlights() {
-    const ticketFlights = await this.websocketService.findAllTicketFlights();
+  async findAllTicketFlights(
+    @MessageBody() paginationParams?: PaginationParams,
+  ) {
+    const pagination = new PaginationDto(paginationParams);
+    const ticketFlights =
+      await this.websocketService.findAllTicketFlights(pagination);
     this.server.emit('ticketFlights', ticketFlights);
     return ticketFlights;
   }

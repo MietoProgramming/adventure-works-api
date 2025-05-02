@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package airline.common;
+
+// Empty request for getting all entities
+message Empty {}
+
+// Pagination parameters for requests
+message PaginationRequest {
+    int32 page = 1;    // Page number (1-indexed), default is 1
+    int32 limit = 2;   // Items per page, default is 100, max is 1000
+  }
+  
+  // Pagination metadata for responses
+message PageInfo {
+int32 total_items = 1;     // Total number of items
+int32 item_count = 2;      // Number of items in current page
+int32 items_per_page = 3;  // Number of items per page
+int32 total_pages = 4;     // Total number of pages
+int32 current_page = 5;    // Current page number
+}

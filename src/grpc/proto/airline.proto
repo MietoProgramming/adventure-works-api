@@ -2,14 +2,12 @@ syntax = "proto3";
 
 package airline;
 
-// Import all service-specific proto files
-import "./common/common.proto";
-import "./flight/flight.proto";
-import "./booking/booking.proto";
-import "./aircraft/aircraft.proto";
-import "./airport/airport.proto";
-import "./ticket/ticket.proto";
-import "./ticket-flight/ticket-flight.proto";
+import "flight.proto";
+import "booking.proto";
+import "aircraft.proto";
+import "airport.proto";
+import "ticket.proto";
+import "ticket-flight.proto";
 
 // This main proto file imports all service-specific protos to maintain compatibility
 // with the previous monolithic setup while allowing services to be split out

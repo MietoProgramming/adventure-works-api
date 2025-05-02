@@ -2,15 +2,19 @@
 // versions:
 //   protoc-gen-ts_proto  v2.7.0
 //   protoc               v6.30.2
-// source: src/grpc/proto/airport/airport.proto
+// source: airport.proto
 
 /* eslint-disable */
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
 import { GrpcMethod, GrpcStreamMethod } from "@nestjs/microservices";
 import { Observable } from "rxjs";
-import { Empty } from "../common/common";
+import { PageInfo, PaginationRequest } from "./common";
 
 export const protobufPackage = "airline.airport";
+
+export interface GetAllAirportsRequest {
+  pagination: PaginationRequest | undefined;
+}
 
 export interface AirportByCodeRequest {
   airportCode: string;
@@ -27,7 +31,49 @@ export interface AirportList {
   airports: Airport[];
 }
 
+export interface PaginatedAirportList {
+  airports: Airport[];
+  pageInfo: PageInfo | undefined;
+}
+
 export const AIRLINE_AIRPORT_PACKAGE_NAME = "airline.airport";
+
+function createBaseGetAllAirportsRequest(): GetAllAirportsRequest {
+  return { pagination: undefined };
+}
+
+export const GetAllAirportsRequest: MessageFns<GetAllAirportsRequest> = {
+  encode(message: GetAllAirportsRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.pagination !== undefined) {
+      PaginationRequest.encode(message.pagination, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetAllAirportsRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetAllAirportsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.pagination = PaginationRequest.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+};
 
 function createBaseAirportByCodeRequest(): AirportByCodeRequest {
   return { airportCode: "" };
@@ -173,10 +219,58 @@ export const AirportList: MessageFns<AirportList> = {
   },
 };
 
+function createBasePaginatedAirportList(): PaginatedAirportList {
+  return { airports: [], pageInfo: undefined };
+}
+
+export const PaginatedAirportList: MessageFns<PaginatedAirportList> = {
+  encode(message: PaginatedAirportList, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    for (const v of message.airports) {
+      Airport.encode(v!, writer.uint32(10).fork()).join();
+    }
+    if (message.pageInfo !== undefined) {
+      PageInfo.encode(message.pageInfo, writer.uint32(18).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): PaginatedAirportList {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasePaginatedAirportList();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.airports.push(Airport.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.pageInfo = PageInfo.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+};
+
 /** Airport Service */
 
 export interface AirportServiceClient {
-  getAllAirports(request: Empty, ...rest: any): Observable<AirportList>;
+  getAllAirports(request: GetAllAirportsRequest, ...rest: any): Observable<PaginatedAirportList>;
 
   getAirportByCode(request: AirportByCodeRequest, ...rest: any): Observable<Airport>;
 }
@@ -184,7 +278,10 @@ export interface AirportServiceClient {
 /** Airport Service */
 
 export interface AirportServiceController {
-  getAllAirports(request: Empty, ...rest: any): Promise<AirportList> | Observable<AirportList> | AirportList;
+  getAllAirports(
+    request: GetAllAirportsRequest,
+    ...rest: any
+  ): Promise<PaginatedAirportList> | Observable<PaginatedAirportList> | PaginatedAirportList;
 
   getAirportByCode(request: AirportByCodeRequest, ...rest: any): Promise<Airport> | Observable<Airport> | Airport;
 }

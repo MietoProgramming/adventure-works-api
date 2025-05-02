@@ -1,5 +1,6 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Booking } from './booking.model';
+import { PageInfo } from './pagination.model';
 import { TicketFlight } from './ticket-flight.model';
 
 @ObjectType()
@@ -24,4 +25,13 @@ export class Ticket {
 
   @Field(() => [TicketFlight], { nullable: true })
   ticketFlights?: TicketFlight[];
+}
+
+@ObjectType()
+export class PaginatedTickets {
+  @Field(() => [Ticket])
+  data: Ticket[];
+
+  @Field(() => PageInfo)
+  meta: PageInfo;
 }

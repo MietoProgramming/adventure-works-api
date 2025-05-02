@@ -1,6 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../../prisma/prisma.service';
+import {
+  PaginatedResult,
+  PaginationDto,
+} from '../../core/models/pagination.dto';
 import { Booking } from '../models/booking.model';
 import { BookingRepository } from './booking.repository';
 
@@ -8,17 +12,27 @@ import { BookingRepository } from './booking.repository';
 export class BookingRepositoryImpl implements BookingRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findAll(): Promise<Booking[]> {
-    const bookings = await this.prisma.bookings.findMany({
-      include: {
-        tickets: true,
-      },
-    });
+  async findAll(
+    pagination?: PaginationDto,
+  ): Promise<Booking[] | PaginatedResult<Booking>> {
+    const { page, limit } = new PaginationDto(pagination);
+    const skip = (page - 1) * limit;
 
-    return bookings.map((booking) => ({
+    const [bookings, total] = await Promise.all([
+      this.prisma.bookings.findMany({
+        skip,
+        take: limit,
+        include: {
+          tickets: true,
+        },
+      }),
+      this.prisma.bookings.count(),
+    ]);
+    const mappedBookings = bookings.map((booking) => ({
       ...booking,
       total_amount: booking.total_amount.toNumber(),
     }));
+    return new PaginatedResult(mappedBookings, total, { page, limit });
   }
 
   async findById(id: string): Promise<Booking | null> {

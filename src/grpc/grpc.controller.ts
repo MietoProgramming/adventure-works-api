@@ -4,36 +4,42 @@ import { Observable } from 'rxjs';
 import {
   Aircraft,
   AircraftByCodeRequest,
-  AircraftList,
-} from './generated/src/grpc/proto/aircraft/aircraft';
+  GetAllAircraftsRequest,
+  PaginatedAircraftList,
+} from './generated/aircraft';
 import {
   Airport,
   AirportByCodeRequest,
-  AirportList,
-} from './generated/src/grpc/proto/airport/airport';
+  GetAllAirportsRequest,
+  PaginatedAirportList,
+} from './generated/airport';
 import {
   Booking,
   BookingByRefRequest,
   BookingEvent,
-  BookingList,
-} from './generated/src/grpc/proto/booking/booking';
+  GetAllBookingsRequest,
+  PaginatedBookingList,
+} from './generated/booking';
 import {
   Flight,
   FlightByIdRequest,
   FlightEvent,
-  FlightList,
   FlightStatusEvent,
-} from './generated/src/grpc/proto/flight/flight';
+  GetAllFlightsRequest,
+  PaginatedFlightList,
+} from './generated/flight';
 import {
-  TicketFlight,
-  TicketFlightByTicketAndFlightIdRequest,
-  TicketFlightList,
-} from './generated/src/grpc/proto/ticket-flight/ticket-flight';
-import {
+  GetAllTicketsRequest,
+  PaginatedTicketList,
   Ticket,
   TicketByNoRequest,
-  TicketList,
-} from './generated/src/grpc/proto/ticket/ticket';
+} from './generated/ticket';
+import {
+  GetAllTicketFlightsRequest,
+  PaginatedTicketFlightList,
+  TicketFlight,
+  TicketFlightByTicketAndFlightIdRequest,
+} from './generated/ticket-flight';
 import { GrpcService } from './grpc.service';
 
 @Controller()
@@ -42,8 +48,10 @@ export class GrpcController {
 
   // Flight Service
   @GrpcMethod('FlightService', 'GetAllFlights')
-  async getAllFlights(): Promise<FlightList> {
-    return this.grpcService.getAllFlights();
+  async getAllFlights(
+    request: GetAllFlightsRequest,
+  ): Promise<PaginatedFlightList> {
+    return this.grpcService.getAllFlights(request);
   }
 
   @GrpcMethod('FlightService', 'GetFlightById')
@@ -68,8 +76,10 @@ export class GrpcController {
 
   // Booking Service
   @GrpcMethod('BookingService', 'GetAllBookings')
-  async getAllBookings(): Promise<BookingList> {
-    return this.grpcService.getAllBookings();
+  async getAllBookings(
+    request: GetAllBookingsRequest,
+  ): Promise<PaginatedBookingList> {
+    return this.grpcService.getAllBookings(request);
   }
 
   @GrpcMethod('BookingService', 'GetBookingByRef')
@@ -94,8 +104,10 @@ export class GrpcController {
 
   // Aircraft Service
   @GrpcMethod('AircraftService', 'GetAllAircrafts')
-  async getAllAircrafts(): Promise<AircraftList> {
-    return this.grpcService.getAllAircrafts();
+  async getAllAircrafts(
+    request: GetAllAircraftsRequest,
+  ): Promise<PaginatedAircraftList> {
+    return this.grpcService.getAllAircrafts(request);
   }
 
   @GrpcMethod('AircraftService', 'GetAircraftByCode')
@@ -105,8 +117,10 @@ export class GrpcController {
 
   // Airport Service
   @GrpcMethod('AirportService', 'GetAllAirports')
-  async getAllAirports(): Promise<AirportList> {
-    return this.grpcService.getAllAirports();
+  async getAllAirports(
+    request: GetAllAirportsRequest,
+  ): Promise<PaginatedAirportList> {
+    return this.grpcService.getAllAirports(request);
   }
 
   @GrpcMethod('AirportService', 'GetAirportByCode')
@@ -116,8 +130,10 @@ export class GrpcController {
 
   // Ticket Service
   @GrpcMethod('TicketService', 'GetAllTickets')
-  async getAllTickets(): Promise<TicketList> {
-    return this.grpcService.getAllTickets();
+  async getAllTickets(
+    request: GetAllTicketsRequest,
+  ): Promise<PaginatedTicketList> {
+    return this.grpcService.getAllTickets(request);
   }
 
   @GrpcMethod('TicketService', 'GetTicketByNo')
@@ -127,8 +143,10 @@ export class GrpcController {
 
   // TicketFlight Service
   @GrpcMethod('TicketFlightService', 'GetAllTicketFlights')
-  async getAllTicketFlights(): Promise<TicketFlightList> {
-    return this.grpcService.getAllTicketFlights();
+  async getAllTicketFlights(
+    request: GetAllTicketFlightsRequest,
+  ): Promise<PaginatedTicketFlightList> {
+    return this.grpcService.getAllTicketFlights(request);
   }
 
   @GrpcMethod('TicketFlightService', 'GetTicketFlightByTicketAndFlightId')

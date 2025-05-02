@@ -1,5 +1,6 @@
-import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
-import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
+import { ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { PaginationQueryDto } from './dto/pagination.dto';
 import { RestService } from './rest.service';
 
 @ApiTags('REST API')
@@ -9,9 +10,21 @@ export class RestController {
 
   // Flight endpoints
   @ApiOperation({ summary: 'Get all flights' })
+  @ApiQuery({
+    name: 'page',
+    type: Number,
+    required: false,
+    description: 'Page number (1-indexed)',
+  })
+  @ApiQuery({
+    name: 'limit',
+    type: Number,
+    required: false,
+    description: 'Number of items per page, max 1000',
+  })
   @Get('flights')
-  findAllFlights() {
-    return this.restService.findAllFlights();
+  findAllFlights(@Query() pagination: PaginationQueryDto) {
+    return this.restService.findAllFlights(pagination);
   }
 
   @ApiOperation({ summary: 'Get a flight by ID' })
@@ -23,9 +36,21 @@ export class RestController {
 
   // Booking endpoints
   @ApiOperation({ summary: 'Get all bookings' })
+  @ApiQuery({
+    name: 'page',
+    type: Number,
+    required: false,
+    description: 'Page number (1-indexed)',
+  })
+  @ApiQuery({
+    name: 'limit',
+    type: Number,
+    required: false,
+    description: 'Number of items per page, max 1000',
+  })
   @Get('bookings')
-  findAllBookings() {
-    return this.restService.findAllBookings();
+  findAllBookings(@Query() pagination: PaginationQueryDto) {
+    return this.restService.findAllBookings(pagination);
   }
 
   @ApiOperation({ summary: 'Get a booking by reference' })
@@ -37,9 +62,21 @@ export class RestController {
 
   // Aircraft endpoints
   @ApiOperation({ summary: 'Get all aircrafts' })
+  @ApiQuery({
+    name: 'page',
+    type: Number,
+    required: false,
+    description: 'Page number (1-indexed)',
+  })
+  @ApiQuery({
+    name: 'limit',
+    type: Number,
+    required: false,
+    description: 'Number of items per page, max 1000',
+  })
   @Get('aircrafts')
-  findAllAircrafts() {
-    return this.restService.findAllAircrafts();
+  findAllAircrafts(@Query() pagination: PaginationQueryDto) {
+    return this.restService.findAllAircrafts(pagination);
   }
 
   @ApiOperation({ summary: 'Get an aircraft by code' })
@@ -51,9 +88,21 @@ export class RestController {
 
   // Airport endpoints
   @ApiOperation({ summary: 'Get all airports' })
+  @ApiQuery({
+    name: 'page',
+    type: Number,
+    required: false,
+    description: 'Page number (1-indexed)',
+  })
+  @ApiQuery({
+    name: 'limit',
+    type: Number,
+    required: false,
+    description: 'Number of items per page, max 1000',
+  })
   @Get('airports')
-  findAllAirports() {
-    return this.restService.findAllAirports();
+  findAllAirports(@Query() pagination: PaginationQueryDto) {
+    return this.restService.findAllAirports(pagination);
   }
 
   @ApiOperation({ summary: 'Get an airport by code' })
@@ -65,9 +114,21 @@ export class RestController {
 
   // Ticket endpoints
   @ApiOperation({ summary: 'Get all tickets' })
+  @ApiQuery({
+    name: 'page',
+    type: Number,
+    required: false,
+    description: 'Page number (1-indexed)',
+  })
+  @ApiQuery({
+    name: 'limit',
+    type: Number,
+    required: false,
+    description: 'Number of items per page, max 1000',
+  })
   @Get('tickets')
-  findAllTickets() {
-    return this.restService.findAllTickets();
+  findAllTickets(@Query() pagination: PaginationQueryDto) {
+    return this.restService.findAllTickets(pagination);
   }
 
   @ApiOperation({ summary: 'Get a ticket by number' })
@@ -79,9 +140,21 @@ export class RestController {
 
   // TicketFlight endpoints
   @ApiOperation({ summary: 'Get all ticket flights' })
+  @ApiQuery({
+    name: 'page',
+    type: Number,
+    required: false,
+    description: 'Page number (1-indexed)',
+  })
+  @ApiQuery({
+    name: 'limit',
+    type: Number,
+    required: false,
+    description: 'Number of items per page, max 1000',
+  })
   @Get('ticket-flights')
-  findAllTicketFlights() {
-    return this.restService.findAllTicketFlights();
+  findAllTicketFlights(@Query() pagination: PaginationQueryDto) {
+    return this.restService.findAllTicketFlights(pagination);
   }
 
   @ApiOperation({

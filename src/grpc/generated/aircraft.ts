@@ -2,15 +2,19 @@
 // versions:
 //   protoc-gen-ts_proto  v2.7.0
 //   protoc               v6.30.2
-// source: src/grpc/proto/aircraft/aircraft.proto
+// source: aircraft.proto
 
 /* eslint-disable */
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
 import { GrpcMethod, GrpcStreamMethod } from "@nestjs/microservices";
 import { Observable } from "rxjs";
-import { Empty } from "../common/common";
+import { PageInfo, PaginationRequest } from "./common";
 
 export const protobufPackage = "airline.aircraft";
+
+export interface GetAllAircraftsRequest {
+  pagination: PaginationRequest | undefined;
+}
 
 export interface AircraftByCodeRequest {
   aircraftCode: string;
@@ -26,7 +30,49 @@ export interface AircraftList {
   aircrafts: Aircraft[];
 }
 
+export interface PaginatedAircraftList {
+  aircrafts: Aircraft[];
+  pageInfo: PageInfo | undefined;
+}
+
 export const AIRLINE_AIRCRAFT_PACKAGE_NAME = "airline.aircraft";
+
+function createBaseGetAllAircraftsRequest(): GetAllAircraftsRequest {
+  return { pagination: undefined };
+}
+
+export const GetAllAircraftsRequest: MessageFns<GetAllAircraftsRequest> = {
+  encode(message: GetAllAircraftsRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.pagination !== undefined) {
+      PaginationRequest.encode(message.pagination, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetAllAircraftsRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetAllAircraftsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.pagination = PaginationRequest.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+};
 
 function createBaseAircraftByCodeRequest(): AircraftByCodeRequest {
   return { aircraftCode: "" };
@@ -161,10 +207,58 @@ export const AircraftList: MessageFns<AircraftList> = {
   },
 };
 
+function createBasePaginatedAircraftList(): PaginatedAircraftList {
+  return { aircrafts: [], pageInfo: undefined };
+}
+
+export const PaginatedAircraftList: MessageFns<PaginatedAircraftList> = {
+  encode(message: PaginatedAircraftList, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    for (const v of message.aircrafts) {
+      Aircraft.encode(v!, writer.uint32(10).fork()).join();
+    }
+    if (message.pageInfo !== undefined) {
+      PageInfo.encode(message.pageInfo, writer.uint32(18).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): PaginatedAircraftList {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasePaginatedAircraftList();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.aircrafts.push(Aircraft.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.pageInfo = PageInfo.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+};
+
 /** Aircraft Service */
 
 export interface AircraftServiceClient {
-  getAllAircrafts(request: Empty, ...rest: any): Observable<AircraftList>;
+  getAllAircrafts(request: GetAllAircraftsRequest, ...rest: any): Observable<PaginatedAircraftList>;
 
   getAircraftByCode(request: AircraftByCodeRequest, ...rest: any): Observable<Aircraft>;
 }
@@ -172,7 +266,10 @@ export interface AircraftServiceClient {
 /** Aircraft Service */
 
 export interface AircraftServiceController {
-  getAllAircrafts(request: Empty, ...rest: any): Promise<AircraftList> | Observable<AircraftList> | AircraftList;
+  getAllAircrafts(
+    request: GetAllAircraftsRequest,
+    ...rest: any
+  ): Promise<PaginatedAircraftList> | Observable<PaginatedAircraftList> | PaginatedAircraftList;
 
   getAircraftByCode(request: AircraftByCodeRequest, ...rest: any): Promise<Aircraft> | Observable<Aircraft> | Aircraft;
 }

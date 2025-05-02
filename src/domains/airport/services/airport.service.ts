@@ -1,4 +1,8 @@
 import { Injectable } from '@nestjs/common';
+import {
+  PaginatedResult,
+  PaginationDto,
+} from '../../core/models/pagination.dto';
 import { Airport } from '../models/airport.model';
 import { AirportRepositoryImpl } from '../repositories/airport.repository.impl';
 
@@ -6,8 +10,11 @@ import { AirportRepositoryImpl } from '../repositories/airport.repository.impl';
 export class AirportService {
   constructor(private readonly airportRepository: AirportRepositoryImpl) {}
 
-  async findAll(): Promise<Airport[]> {
-    return this.airportRepository.findAll();
+  async findAll(
+    pagination?: PaginationDto,
+  ): Promise<Airport[] | PaginatedResult<Airport>> {
+    pagination = new PaginationDto(pagination);
+    return this.airportRepository.findAll(pagination);
   }
 
   async findByCode(airportCode: string): Promise<Airport | null> {

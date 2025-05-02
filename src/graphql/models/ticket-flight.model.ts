@@ -1,6 +1,7 @@
-import { Field, Int, ObjectType } from '@nestjs/graphql';
+import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
 import { BoardingPass } from './boarding-pass.model';
 import { Flight } from './flight.model';
+import { PageInfo } from './pagination.model';
 import { Ticket } from './ticket.model';
 
 @ObjectType()
@@ -14,7 +15,7 @@ export class TicketFlight {
   @Field()
   fare_conditions: string;
 
-  @Field(() => Number)
+  @Field(() => Float)
   amount: number;
 
   @Field(() => Flight, { nullable: true })
@@ -25,4 +26,13 @@ export class TicketFlight {
 
   @Field(() => BoardingPass, { nullable: true })
   boardingPass?: BoardingPass;
+}
+
+@ObjectType()
+export class PaginatedTicketFlights {
+  @Field(() => [TicketFlight])
+  data: TicketFlight[];
+
+  @Field(() => PageInfo)
+  meta: PageInfo;
 }

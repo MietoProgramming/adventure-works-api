@@ -2,8 +2,8 @@ syntax = "proto3";
 
 package airline.booking;
 
-import "common/common.proto";
-
+ import "common.proto";
+ 
 
 // Booking Service
 service BookingService {

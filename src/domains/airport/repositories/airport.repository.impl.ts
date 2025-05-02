@@ -1,6 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../../prisma/prisma.service';
+import {
+  PaginatedResult,
+  PaginationDto,
+} from '../../core/models/pagination.dto';
 import { Airport } from '../models/airport.model';
 import { AirportRepository } from './airport.repository';
 
@@ -8,8 +12,25 @@ import { AirportRepository } from './airport.repository';
 export class AirportRepositoryImpl implements AirportRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findAll(): Promise<Airport[]> {
-    return this.prisma.airports_data.findMany();
+  async findAll(
+    pagination?: PaginationDto,
+  ): Promise<Airport[] | PaginatedResult<Airport>> {
+    const { page, limit } = new PaginationDto(pagination);
+    const skip = (page - 1) * limit;
+
+    const [airports, total] = await Promise.all([
+      this.prisma.airports_data.findMany({
+        skip,
+        take: limit,
+        include: {
+          flights_flights_arrival_airportToairports_data: true,
+          flights_flights_departure_airportToairports_data: true,
+        },
+      }),
+      this.prisma.airports_data.count(),
+    ]);
+
+    return new PaginatedResult(airports, total, { page, limit });
   }
 
   async findById(id: string): Promise<Airport | null> {
@@ -25,12 +46,6 @@ export class AirportRepositoryImpl implements AirportRepository {
       },
     });
   }
-
-  // async create(data: Prisma.airports_dataCreateInput): Promise<Airport> {
-  //   return this.prisma.airports_data.create({
-  //     data,
-  //   });
-  // }
 
   async update(
     id: string,

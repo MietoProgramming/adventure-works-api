@@ -1,5 +1,6 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, Float, ObjectType } from '@nestjs/graphql';
 import { Flight } from './flight.model';
+import { PageInfo } from './pagination.model';
 
 @ObjectType()
 export class Airport {
@@ -12,12 +13,27 @@ export class Airport {
   @Field()
   city: string;
 
+  @Field(() => Float, { nullable: true })
+  coordinates_lon?: number;
+
+  @Field(() => Float, { nullable: true })
+  coordinates_lat?: number;
+
   @Field()
   timezone: string;
 
   @Field(() => [Flight], { nullable: true })
-  departures?: Flight[];
+  departureFlights?: Flight[];
 
   @Field(() => [Flight], { nullable: true })
-  arrivals?: Flight[];
+  arrivalFlights?: Flight[];
+}
+
+@ObjectType()
+export class PaginatedAirports {
+  @Field(() => [Airport])
+  data: Airport[];
+
+  @Field(() => PageInfo)
+  meta: PageInfo;
 }

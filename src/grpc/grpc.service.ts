@@ -4,32 +4,24 @@ import { AircraftService } from '../domains/aircraft/services/aircraft.service';
 import { AirportService } from '../domains/airport/services/airport.service';
 import { BookingService } from '../domains/booking/services/booking.service';
 import { EventBusService } from '../domains/core/events/event-bus.service';
+import { PaginationDto } from '../domains/core/models/pagination.dto';
 import { FlightService } from '../domains/flight/services/flight.service';
 import { TicketFlightService } from '../domains/ticket-flight/services/ticket-flight.service';
 import { TicketService } from '../domains/ticket/services/ticket.service';
 // Import from specific proto files in the generated directory structure
-import {
-  Aircraft,
-  AircraftList,
-} from './generated/src/grpc/proto/aircraft/aircraft';
-import {
-  Airport,
-  AirportList,
-} from './generated/src/grpc/proto/airport/airport';
-import {
-  BookingEvent,
-  BookingList,
-} from './generated/src/grpc/proto/booking/booking';
+import { Aircraft, PaginatedAircraftList } from './generated/aircraft';
+import { Airport, PaginatedAirportList } from './generated/airport';
+import { BookingEvent, PaginatedBookingList } from './generated/booking';
 import {
   FlightEvent,
-  FlightList,
   FlightStatusEvent,
-} from './generated/src/grpc/proto/flight/flight';
+  PaginatedFlightList,
+} from './generated/flight';
+import { PaginatedTicketList, Ticket } from './generated/ticket';
 import {
+  PaginatedTicketFlightList,
   TicketFlight,
-  TicketFlightList,
-} from './generated/src/grpc/proto/ticket-flight/ticket-flight';
-import { Ticket, TicketList } from './generated/src/grpc/proto/ticket/ticket';
+} from './generated/ticket-flight';
 // Import domain event types
 import {
   BookingCanceledEvent,
@@ -147,13 +139,58 @@ export class GrpcService implements OnModuleInit {
     };
   }
 
-  // Flight methods
-  async getAllFlights(): Promise<FlightList> {
-    const flights = await this.flightService.findAll();
+  private createPageInfo(paginatedResult: any): any {
+    if (!paginatedResult.meta) {
+      return {
+        totalItems: 0,
+        itemCount: 0,
+        itemsPerPage: 0,
+        totalPages: 0,
+        currentPage: 1,
+      };
+    }
+
     return {
-      flights: flights.map((flight) =>
+      totalItems: paginatedResult.meta.totalItems,
+      itemCount: paginatedResult.meta.itemCount,
+      itemsPerPage: paginatedResult.meta.itemsPerPage,
+      totalPages: paginatedResult.meta.totalPages,
+      currentPage: paginatedResult.meta.currentPage,
+    };
+  }
+
+  // Flight methods
+  async getAllFlights(request: any): Promise<PaginatedFlightList> {
+    const pagination = new PaginationDto({
+      page: request.pagination?.page || 1,
+      limit: Math.min(request.pagination?.limit || 100, 1000),
+    });
+
+    const result = await this.flightService.findAll(pagination);
+
+    let flights = [];
+    let pageInfo = {
+      totalItems: 0,
+      itemCount: 0,
+      itemsPerPage: pagination.limit,
+      totalPages: 0,
+      currentPage: pagination.page,
+    };
+
+    if ('data' in result && Array.isArray(result.data)) {
+      flights = result.data.map((flight) =>
         this.mapDomainFlightToProtoFlight(flight),
-      ),
+      );
+      pageInfo = this.createPageInfo(result);
+    } else if (Array.isArray(result)) {
+      flights = result.map((flight) =>
+        this.mapDomainFlightToProtoFlight(flight),
+      );
+    }
+
+    return {
+      flights: flights,
+      pageInfo: pageInfo,
     };
   }
 
@@ -175,12 +212,37 @@ export class GrpcService implements OnModuleInit {
   }
 
   // Booking methods
-  async getAllBookings(): Promise<BookingList> {
-    const bookings = await this.bookingService.findAll();
-    return {
-      bookings: bookings.map((booking) =>
+  async getAllBookings(request: any): Promise<PaginatedBookingList> {
+    const pagination = new PaginationDto({
+      page: request.pagination?.page || 1,
+      limit: Math.min(request.pagination?.limit || 100, 1000),
+    });
+
+    const result = await this.bookingService.findAll(pagination);
+
+    let bookings = [];
+    let pageInfo = {
+      totalItems: 0,
+      itemCount: 0,
+      itemsPerPage: pagination.limit,
+      totalPages: 0,
+      currentPage: pagination.page,
+    };
+
+    if ('data' in result && Array.isArray(result.data)) {
+      bookings = result.data.map((booking) =>
         this.mapDomainBookingToProtoBooking(booking),
-      ),
+      );
+      pageInfo = this.createPageInfo(result);
+    } else if (Array.isArray(result)) {
+      bookings = result.map((booking) =>
+        this.mapDomainBookingToProtoBooking(booking),
+      );
+    }
+
+    return {
+      bookings: bookings,
+      pageInfo: pageInfo,
     };
   }
 
@@ -202,14 +264,41 @@ export class GrpcService implements OnModuleInit {
   }
 
   // Aircraft methods
-  async getAllAircrafts(): Promise<AircraftList> {
-    const aircrafts = await this.aircraftService.findAll();
-    return {
-      aircrafts: aircrafts.map((aircraft) => ({
+  async getAllAircrafts(request: any): Promise<PaginatedAircraftList> {
+    const pagination = new PaginationDto({
+      page: request.pagination?.page || 1,
+      limit: Math.min(request.pagination?.limit || 100, 1000),
+    });
+
+    const result = await this.aircraftService.findAll(pagination);
+
+    let aircrafts = [];
+    let pageInfo = {
+      totalItems: 0,
+      itemCount: 0,
+      itemsPerPage: pagination.limit,
+      totalPages: 0,
+      currentPage: pagination.page,
+    };
+
+    if ('data' in result && Array.isArray(result.data)) {
+      aircrafts = result.data.map((aircraft) => ({
         aircraftCode: aircraft.aircraft_code,
         model: String(aircraft.model),
         range: aircraft.range,
-      })),
+      }));
+      pageInfo = this.createPageInfo(result);
+    } else if (Array.isArray(result)) {
+      aircrafts = result.map((aircraft) => ({
+        aircraftCode: aircraft.aircraft_code,
+        model: String(aircraft.model),
+        range: aircraft.range,
+      }));
+    }
+
+    return {
+      aircrafts: aircrafts,
+      pageInfo: pageInfo,
     };
   }
 
@@ -223,15 +312,43 @@ export class GrpcService implements OnModuleInit {
   }
 
   // Airport methods
-  async getAllAirports(): Promise<AirportList> {
-    const airports = await this.airportService.findAll();
-    return {
-      airports: airports.map((airport) => ({
+  async getAllAirports(request: any): Promise<PaginatedAirportList> {
+    const pagination = new PaginationDto({
+      page: request.pagination?.page || 1,
+      limit: Math.min(request.pagination?.limit || 100, 1000),
+    });
+
+    const result = await this.airportService.findAll(pagination);
+
+    let airports = [];
+    let pageInfo = {
+      totalItems: 0,
+      itemCount: 0,
+      itemsPerPage: pagination.limit,
+      totalPages: 0,
+      currentPage: pagination.page,
+    };
+
+    if ('data' in result && Array.isArray(result.data)) {
+      airports = result.data.map((airport) => ({
         airportCode: airport.airport_code,
         airportName: String(airport.airport_name),
         city: String(airport.city),
         timezone: airport.timezone,
-      })),
+      }));
+      pageInfo = this.createPageInfo(result);
+    } else if (Array.isArray(result)) {
+      airports = result.map((airport) => ({
+        airportCode: airport.airport_code,
+        airportName: String(airport.airport_name),
+        city: String(airport.city),
+        timezone: airport.timezone,
+      }));
+    }
+
+    return {
+      airports: airports,
+      pageInfo: pageInfo,
     };
   }
 
@@ -246,16 +363,45 @@ export class GrpcService implements OnModuleInit {
   }
 
   // Ticket methods
-  async getAllTickets(): Promise<TicketList> {
-    const tickets = await this.ticketService.findAll();
-    return {
-      tickets: tickets.map((ticket) => ({
+  async getAllTickets(request: any): Promise<PaginatedTicketList> {
+    const pagination = new PaginationDto({
+      page: request.pagination?.page || 1,
+      limit: Math.min(request.pagination?.limit || 100, 1000),
+    });
+
+    const result = await this.ticketService.findAll(pagination);
+
+    let tickets = [];
+    let pageInfo = {
+      totalItems: 0,
+      itemCount: 0,
+      itemsPerPage: pagination.limit,
+      totalPages: 0,
+      currentPage: pagination.page,
+    };
+
+    if ('data' in result && Array.isArray(result.data)) {
+      tickets = result.data.map((ticket) => ({
         ticketNo: ticket.ticket_no,
         bookRef: ticket.book_ref,
         passengerId: ticket.passenger_id,
         passengerName: ticket.passenger_name,
         contactData: String(ticket.contact_data),
-      })),
+      }));
+      pageInfo = this.createPageInfo(result);
+    } else if (Array.isArray(result)) {
+      tickets = result.map((ticket) => ({
+        ticketNo: ticket.ticket_no,
+        bookRef: ticket.book_ref,
+        passengerId: ticket.passenger_id,
+        passengerName: ticket.passenger_name,
+        contactData: String(ticket.contact_data),
+      }));
+    }
+
+    return {
+      tickets: tickets,
+      pageInfo: pageInfo,
     };
   }
 
@@ -271,15 +417,43 @@ export class GrpcService implements OnModuleInit {
   }
 
   // TicketFlight methods
-  async getAllTicketFlights(): Promise<TicketFlightList> {
-    const ticketFlights = await this.ticketFlightService.findAll();
-    return {
-      ticketFlights: ticketFlights.map((tf) => ({
+  async getAllTicketFlights(request: any): Promise<PaginatedTicketFlightList> {
+    const pagination = new PaginationDto({
+      page: request.pagination?.page || 1,
+      limit: Math.min(request.pagination?.limit || 100, 1000),
+    });
+
+    const result = await this.ticketFlightService.findAll(pagination);
+
+    let ticketFlights = [];
+    let pageInfo = {
+      totalItems: 0,
+      itemCount: 0,
+      itemsPerPage: pagination.limit,
+      totalPages: 0,
+      currentPage: pagination.page,
+    };
+
+    if ('data' in result && Array.isArray(result.data)) {
+      ticketFlights = result.data.map((tf) => ({
         ticketNo: tf.ticket_no,
         flightId: tf.flight_id,
         fareConditions: tf.fare_conditions,
         amount: tf.amount,
-      })),
+      }));
+      pageInfo = this.createPageInfo(result);
+    } else if (Array.isArray(result)) {
+      ticketFlights = result.map((tf) => ({
+        ticketNo: tf.ticket_no,
+        flightId: tf.flight_id,
+        fareConditions: tf.fare_conditions,
+        amount: tf.amount,
+      }));
+    }
+
+    return {
+      ticketFlights: ticketFlights,
+      pageInfo: pageInfo,
     };
   }
 

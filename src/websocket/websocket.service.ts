@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { AircraftService } from '../domains/aircraft/services/aircraft.service';
 import { AirportService } from '../domains/airport/services/airport.service';
 import { BookingService } from '../domains/booking/services/booking.service';
+import { PaginationDto } from '../domains/core/models/pagination.dto';
 import { FlightService } from '../domains/flight/services/flight.service';
 import { TicketFlightService } from '../domains/ticket-flight/services/ticket-flight.service';
 import { TicketService } from '../domains/ticket/services/ticket.service';
@@ -18,8 +19,8 @@ export class WebsocketService {
   ) {}
 
   // Flight methods
-  async findAllFlights() {
-    return this.flightService.findAll();
+  async findAllFlights(pagination?: PaginationDto) {
+    return this.flightService.findAll(pagination);
   }
 
   async findFlightById(id: number) {
@@ -27,8 +28,8 @@ export class WebsocketService {
   }
 
   // Booking methods
-  async findAllBookings() {
-    return this.bookingService.findAll();
+  async findAllBookings(pagination?: PaginationDto) {
+    return this.bookingService.findAll(pagination);
   }
 
   async findBookingByRef(bookRef: string) {
@@ -36,8 +37,8 @@ export class WebsocketService {
   }
 
   // Aircraft methods
-  async findAllAircrafts() {
-    return this.aircraftService.findAll();
+  async findAllAircrafts(pagination?: PaginationDto) {
+    return this.aircraftService.findAll(pagination);
   }
 
   async findAircraftByCode(aircraftCode: string) {
@@ -45,8 +46,8 @@ export class WebsocketService {
   }
 
   // Airport methods
-  async findAllAirports() {
-    return this.airportService.findAll();
+  async findAllAirports(pagination?: PaginationDto) {
+    return this.airportService.findAll(pagination);
   }
 
   async findAirportByCode(airportCode: string) {
@@ -54,8 +55,8 @@ export class WebsocketService {
   }
 
   // Ticket methods
-  async findAllTickets() {
-    return this.ticketService.findAll();
+  async findAllTickets(pagination?: PaginationDto) {
+    return this.ticketService.findAll(pagination);
   }
 
   async findTicketByNo(ticketNo: string) {
@@ -63,8 +64,8 @@ export class WebsocketService {
   }
 
   // TicketFlight methods
-  async findAllTicketFlights() {
-    return this.ticketFlightService.findAll();
+  async findAllTicketFlights(pagination?: PaginationDto) {
+    return this.ticketFlightService.findAll(pagination);
   }
 
   async findTicketFlightByTicketAndFlightId(

@@ -2,9 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { AircraftService } from '../domains/aircraft/services/aircraft.service';
 import { AirportService } from '../domains/airport/services/airport.service';
 import { BookingService } from '../domains/booking/services/booking.service';
+import { PaginationDto } from '../domains/core/models/pagination.dto';
 import { FlightService } from '../domains/flight/services/flight.service';
 import { TicketFlightService } from '../domains/ticket-flight/services/ticket-flight.service';
 import { TicketService } from '../domains/ticket/services/ticket.service';
+import { PaginationQueryDto } from './dto/pagination.dto';
 
 @Injectable()
 export class RestService {
@@ -18,8 +20,9 @@ export class RestService {
   ) {}
 
   // Flight methods
-  async findAllFlights() {
-    return this.flightService.findAll();
+  async findAllFlights(pagination?: PaginationQueryDto) {
+    const paginationDto = new PaginationDto(pagination);
+    return this.flightService.findAll(paginationDto);
   }
 
   async findFlightById(id: number) {
@@ -27,8 +30,9 @@ export class RestService {
   }
 
   // Booking methods
-  async findAllBookings() {
-    return this.bookingService.findAll();
+  async findAllBookings(pagination?: PaginationQueryDto) {
+    const paginationDto = new PaginationDto(pagination);
+    return this.bookingService.findAll(paginationDto);
   }
 
   async findBookingByRef(bookRef: string) {
@@ -36,8 +40,9 @@ export class RestService {
   }
 
   // Aircraft methods
-  async findAllAircrafts() {
-    return this.aircraftService.findAll();
+  async findAllAircrafts(pagination?: PaginationQueryDto) {
+    const paginationDto = new PaginationDto(pagination);
+    return this.aircraftService.findAll(paginationDto);
   }
 
   async findAircraftByCode(aircraftCode: string) {
@@ -45,8 +50,9 @@ export class RestService {
   }
 
   // Airport methods
-  async findAllAirports() {
-    return this.airportService.findAll();
+  async findAllAirports(pagination?: PaginationQueryDto) {
+    const paginationDto = new PaginationDto(pagination);
+    return this.airportService.findAll(paginationDto);
   }
 
   async findAirportByCode(airportCode: string) {
@@ -54,8 +60,9 @@ export class RestService {
   }
 
   // Ticket methods
-  async findAllTickets() {
-    return this.ticketService.findAll();
+  async findAllTickets(pagination?: PaginationQueryDto) {
+    const paginationDto = new PaginationDto(pagination);
+    return this.ticketService.findAll(paginationDto);
   }
 
   async findTicketByNo(ticketNo: string) {
@@ -63,8 +70,9 @@ export class RestService {
   }
 
   // TicketFlight methods
-  async findAllTicketFlights() {
-    return this.ticketFlightService.findAll();
+  async findAllTicketFlights(pagination?: PaginationQueryDto) {
+    const paginationDto = new PaginationDto(pagination);
+    return this.ticketFlightService.findAll(paginationDto);
   }
 
   async findTicketFlightByTicketAndFlightId(

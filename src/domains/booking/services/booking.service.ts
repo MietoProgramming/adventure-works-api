@@ -1,6 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { EventBusService } from '../../core/events/event-bus.service';
 import {
+  PaginatedResult,
+  PaginationDto,
+} from '../../core/models/pagination.dto';
+import {
   BookingCanceledEvent,
   BookingCreatedEvent,
   BookingUpdatedEvent,
@@ -15,8 +19,11 @@ export class BookingService {
     private readonly eventBus: EventBusService,
   ) {}
 
-  async findAll(): Promise<Booking[]> {
-    return this.bookingRepository.findAll();
+  async findAll(
+    pagination?: PaginationDto,
+  ): Promise<Booking[] | PaginatedResult<Booking>> {
+    pagination = new PaginationDto(pagination);
+    return this.bookingRepository.findAll(pagination);
   }
 
   async findByRef(bookRef: string): Promise<Booking | null> {

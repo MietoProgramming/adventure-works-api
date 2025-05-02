@@ -1,6 +1,0 @@
-syntax = "proto3";
-
-package airline.common;
-
-// Empty request for getting all entities
-message Empty {}

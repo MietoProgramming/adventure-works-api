@@ -1,4 +1,8 @@
 import { Injectable } from '@nestjs/common';
+import {
+  PaginatedResult,
+  PaginationDto,
+} from '../../core/models/pagination.dto';
 import { Aircraft } from '../models/aircraft.model';
 import { AircraftRepositoryImpl } from '../repositories/aircraft.repository.impl';
 
@@ -6,8 +10,11 @@ import { AircraftRepositoryImpl } from '../repositories/aircraft.repository.impl
 export class AircraftService {
   constructor(private readonly aircraftRepository: AircraftRepositoryImpl) {}
 
-  async findAll(): Promise<Aircraft[]> {
-    return this.aircraftRepository.findAll();
+  async findAll(
+    pagination?: PaginationDto,
+  ): Promise<Aircraft[] | PaginatedResult<Aircraft>> {
+    pagination = new PaginationDto(pagination);
+    return this.aircraftRepository.findAll(pagination);
   }
 
   async findByCode(aircraftCode: string): Promise<Aircraft | null> {

@@ -1,4 +1,8 @@
 import { Injectable } from '@nestjs/common';
+import {
+  PaginatedResult,
+  PaginationDto,
+} from '../../core/models/pagination.dto';
 import { Ticket } from '../models/ticket.model';
 import { TicketRepositoryImpl } from '../repositories/ticket.repository.impl';
 
@@ -6,8 +10,11 @@ import { TicketRepositoryImpl } from '../repositories/ticket.repository.impl';
 export class TicketService {
   constructor(private readonly ticketRepository: TicketRepositoryImpl) {}
 
-  async findAll(): Promise<Ticket[]> {
-    return this.ticketRepository.findAll();
+  async findAll(
+    pagination?: PaginationDto,
+  ): Promise<Ticket[] | PaginatedResult<Ticket>> {
+    pagination = new PaginationDto(pagination);
+    return this.ticketRepository.findAll(pagination);
   }
 
   async findByTicketNo(ticketNo: string): Promise<Ticket | null> {

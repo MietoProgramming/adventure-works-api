@@ -1,6 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../../prisma/prisma.service';
+import {
+  PaginatedResult,
+  PaginationDto,
+} from '../../core/models/pagination.dto';
 import { Ticket } from '../models/ticket.model';
 import { TicketRepository } from './ticket.repository';
 
@@ -8,21 +12,35 @@ import { TicketRepository } from './ticket.repository';
 export class TicketRepositoryImpl implements TicketRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findAll(): Promise<Ticket[]> {
-    const tickets = await this.prisma.tickets.findMany({
-      include: {
-        bookings: true,
-        ticket_flights: true,
-      },
-    });
+  async findAll(
+    pagination?: PaginationDto,
+  ): Promise<Ticket[] | PaginatedResult<Ticket>> {
+    const { page, limit } = new PaginationDto(pagination);
+    const skip = (page - 1) * limit;
 
-    return tickets.map((ticket) => ({
-      ...ticket,
-      ticket_flights: ticket.ticket_flights.map((flight) => ({
-        ...flight,
-        amount: flight.amount.toNumber(),
+    const [tickets, total] = await Promise.all([
+      this.prisma.tickets.findMany({
+        skip,
+        take: limit,
+        include: {
+          bookings: true,
+          ticket_flights: true,
+        },
+      }),
+      this.prisma.tickets.count(),
+    ]);
+
+    return new PaginatedResult(
+      tickets.map((ticket) => ({
+        ...ticket,
+        ticket_flights: ticket.ticket_flights.map((flight) => ({
+          ...flight,
+          amount: flight.amount.toNumber(),
+        })),
       })),
-    }));
+      total,
+      { page, limit },
+    );
   }
 
   async findById(id: string): Promise<Ticket | null> {

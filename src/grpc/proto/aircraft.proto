@@ -2,8 +2,8 @@ syntax = "proto3";
 
 package airline.aircraft;
 
-import "common/common.proto";
-
+import "common.proto";
+ 
 
 // Aircraft Service
 service AircraftService {

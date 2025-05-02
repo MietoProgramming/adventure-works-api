@@ -14,7 +14,7 @@ import { GrpcService } from './grpc.service';
         transport: Transport.GRPC,
         options: {
           package: 'airline.flight',
-          protoPath: join(__dirname, 'proto/flight/flight.proto'),
+          protoPath: join(__dirname, 'proto/flight.proto'),
         },
       },
       {
@@ -22,7 +22,7 @@ import { GrpcService } from './grpc.service';
         transport: Transport.GRPC,
         options: {
           package: 'airline.booking',
-          protoPath: join(__dirname, 'proto/booking/booking.proto'),
+          protoPath: join(__dirname, 'proto/booking.proto'),
         },
       },
       {
@@ -30,7 +30,7 @@ import { GrpcService } from './grpc.service';
         transport: Transport.GRPC,
         options: {
           package: 'airline.aircraft',
-          protoPath: join(__dirname, 'proto/aircraft/aircraft.proto'),
+          protoPath: join(__dirname, 'proto/aircraft.proto'),
         },
       },
       {
@@ -38,7 +38,7 @@ import { GrpcService } from './grpc.service';
         transport: Transport.GRPC,
         options: {
           package: 'airline.airport',
-          protoPath: join(__dirname, 'proto/airport/airport.proto'),
+          protoPath: join(__dirname, 'proto/airport.proto'),
         },
       },
       {
@@ -46,7 +46,7 @@ import { GrpcService } from './grpc.service';
         transport: Transport.GRPC,
         options: {
           package: 'airline.ticket',
-          protoPath: join(__dirname, 'proto/ticket/ticket.proto'),
+          protoPath: join(__dirname, 'proto/ticket.proto'),
         },
       },
       {
@@ -54,7 +54,7 @@ import { GrpcService } from './grpc.service';
         transport: Transport.GRPC,
         options: {
           package: 'airline.ticketflight',
-          protoPath: join(__dirname, 'proto/ticket-flight/ticket-flight.proto'),
+          protoPath: join(__dirname, 'proto/ticket-flight.proto'),
         },
       },
       {
@@ -62,7 +62,7 @@ import { GrpcService } from './grpc.service';
         transport: Transport.GRPC,
         options: {
           package: 'airline.common',
-          protoPath: join(__dirname, 'proto/common/common.proto'),
+          protoPath: join(__dirname, 'proto/common.proto'),
         },
       },
       {

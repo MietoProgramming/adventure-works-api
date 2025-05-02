@@ -2,15 +2,19 @@
 // versions:
 //   protoc-gen-ts_proto  v2.7.0
 //   protoc               v6.30.2
-// source: src/grpc/proto/ticket-flight/ticket-flight.proto
+// source: ticket-flight.proto
 
 /* eslint-disable */
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
 import { GrpcMethod, GrpcStreamMethod } from "@nestjs/microservices";
 import { Observable } from "rxjs";
-import { Empty } from "../common/common";
+import { PageInfo, PaginationRequest } from "./common";
 
 export const protobufPackage = "airline.ticketflight";
+
+export interface GetAllTicketFlightsRequest {
+  pagination: PaginationRequest | undefined;
+}
 
 export interface TicketFlightByTicketAndFlightIdRequest {
   ticketNo: string;
@@ -28,7 +32,49 @@ export interface TicketFlightList {
   ticketFlights: TicketFlight[];
 }
 
+export interface PaginatedTicketFlightList {
+  ticketFlights: TicketFlight[];
+  pageInfo: PageInfo | undefined;
+}
+
 export const AIRLINE_TICKETFLIGHT_PACKAGE_NAME = "airline.ticketflight";
+
+function createBaseGetAllTicketFlightsRequest(): GetAllTicketFlightsRequest {
+  return { pagination: undefined };
+}
+
+export const GetAllTicketFlightsRequest: MessageFns<GetAllTicketFlightsRequest> = {
+  encode(message: GetAllTicketFlightsRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.pagination !== undefined) {
+      PaginationRequest.encode(message.pagination, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetAllTicketFlightsRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetAllTicketFlightsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.pagination = PaginationRequest.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+};
 
 function createBaseTicketFlightByTicketAndFlightIdRequest(): TicketFlightByTicketAndFlightIdRequest {
   return { ticketNo: "", flightId: 0 };
@@ -185,10 +231,58 @@ export const TicketFlightList: MessageFns<TicketFlightList> = {
   },
 };
 
+function createBasePaginatedTicketFlightList(): PaginatedTicketFlightList {
+  return { ticketFlights: [], pageInfo: undefined };
+}
+
+export const PaginatedTicketFlightList: MessageFns<PaginatedTicketFlightList> = {
+  encode(message: PaginatedTicketFlightList, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    for (const v of message.ticketFlights) {
+      TicketFlight.encode(v!, writer.uint32(10).fork()).join();
+    }
+    if (message.pageInfo !== undefined) {
+      PageInfo.encode(message.pageInfo, writer.uint32(18).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): PaginatedTicketFlightList {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasePaginatedTicketFlightList();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.ticketFlights.push(TicketFlight.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.pageInfo = PageInfo.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+};
+
 /** TicketFlight Service */
 
 export interface TicketFlightServiceClient {
-  getAllTicketFlights(request: Empty, ...rest: any): Observable<TicketFlightList>;
+  getAllTicketFlights(request: GetAllTicketFlightsRequest, ...rest: any): Observable<PaginatedTicketFlightList>;
 
   getTicketFlightByTicketAndFlightId(
     request: TicketFlightByTicketAndFlightIdRequest,
@@ -200,9 +294,9 @@ export interface TicketFlightServiceClient {
 
 export interface TicketFlightServiceController {
   getAllTicketFlights(
-    request: Empty,
+    request: GetAllTicketFlightsRequest,
     ...rest: any
-  ): Promise<TicketFlightList> | Observable<TicketFlightList> | TicketFlightList;
+  ): Promise<PaginatedTicketFlightList> | Observable<PaginatedTicketFlightList> | PaginatedTicketFlightList;
 
   getTicketFlightByTicketAndFlightId(
     request: TicketFlightByTicketAndFlightIdRequest,

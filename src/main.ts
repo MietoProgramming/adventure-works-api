@@ -23,6 +23,9 @@ async function bootstrap() {
         'airline.common',
       ],
       protoPath,
+      loader: {
+        includeDirs: [join(__dirname, 'grpc/proto')],
+      },
       url: 'localhost:5000',
       onLoadPackageDefinition: (pkg, server) => {
         new ReflectionService(pkg).addToServer(server);
