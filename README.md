@@ -55,7 +55,7 @@ WebSocket API available at: ws://[::1]:3000
 
 ## API Protocols
 
-The API is accessible via four different protocols, all running simultaneously on the same server.
+The API is accessible via four different protocols, all running simultaneously on the same server. All list endpoints across all protocols support pagination.
 
 ### 1. REST API
 
@@ -74,6 +74,13 @@ A traditional REST API with the following endpoints:
 - `GET /api/ticket-flights` - Get all ticket flights
 - `GET /api/ticket-flights/:ticketNo/:flightId` - Get a specific ticket flight
 
+All list endpoints support pagination with `page` and `limit` query parameters:
+
+- `page`: Page number (1-indexed)
+- `limit`: Number of items per page, max 1000
+
+Example: `/api/flights?page=2&limit=50`
+
 **Swagger Documentation**
 
 The REST API includes Swagger documentation available at `/api-docs`.
@@ -86,19 +93,36 @@ A GraphQL API that allows flexible querying of the airline booking data.
 
 The GraphQL playground is available at `/graphql` for interactive exploration of the API.
 
+All list queries support pagination using the `pagination` argument:
+
+```graphql
+pagination: {
+  page: Int    # Page number (1-indexed)
+  limit: Int   # Number of items per page
+}
+```
+
 Example queries:
 
 ```graphql
-# Get all flights
+# Get all flights with pagination
 query {
-  flights {
-    flight_id
-    flight_no
-    departure_airport
-    arrival_airport
-    scheduled_departure
-    scheduled_arrival
-    status
+  flights(pagination: { page: 2, limit: 50 }) {
+    items {
+      flight_id
+      flight_no
+      departure_airport
+      arrival_airport
+      scheduled_departure
+      scheduled_arrival
+      status
+    }
+    meta {
+      currentPage
+      itemsPerPage
+      totalItems
+      totalPages
+    }
   }
 }
 
@@ -136,7 +160,7 @@ The following gRPC services are available:
 
 - `FlightService`: Get flight information and stream real-time flight events
 
-  - `GetAllFlights` - Get all flights
+  - `GetAllFlights` - Get all flights (supports pagination)
   - `GetFlightById` - Get a specific flight by ID
   - `StreamFlightCreated` - Stream flight creation events
   - `StreamFlightUpdated` - Stream flight update events
@@ -169,6 +193,11 @@ The following gRPC services are available:
   - `GetAllTicketFlights` - Get all ticket flights
   - `GetTicketFlightByTicketAndFlightId` - Get a specific ticket flight by ticket number and flight ID
 
+All list methods support pagination with the following parameters in their request messages:
+
+- `page`: Page number (1-indexed)
+- `limit`: Number of items per page
+
 Proto files for the services are available in the `/src/grpc/proto` directory.
 
 ### 4. WebSocket API
@@ -187,6 +216,22 @@ The WebSocket API supports both request-response patterns and event-based commun
   - `findAllAirports`, `findAirportByCode`
   - `findAllTickets`, `findTicketByNo`
   - `findAllTicketFlights`, `findTicketFlightByTicketAndFlightId`
+
+All list operations support pagination by passing pagination parameters in the message body:
+
+```javascript
+{
+  page: Number,  // Page number (1-indexed)
+  limit: Number  // Number of items per page
+}
+```
+
+Example:
+
+```javascript
+// Request all flights with pagination
+socket.emit('findAllFlights', { page: 2, limit: 50 });
+```
 
 - **Event Subscriptions**:
 
